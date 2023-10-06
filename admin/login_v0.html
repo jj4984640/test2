@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- <meta name="viewport" content="width=640, user-scalable=no" /> -->
+    <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0" /> -->
+    <title>Welcome</title>
+    <style>
+      body {
+        width: 100%;
+        height: 100vh;
+        margin: 0px;
+      }
+      #login_page_ssc {
+        height: 100%;
+        margin: 0px;
+        overflow: hidden;
+        background-color: #1a1a1a;
+      }
+      #login_page_ssc #username_ssc {
+        width: 211px;
+        height: 25px;
+        background-color: #fffbf8;
+        border: solid 1px #004478;
+        font-size: 20px;
+        font-weight: bold;
+        color: #010a15;
+      }
+      #login_page_ssc #password_ssc {
+        width: 211px;
+        height: 25px;
+        background-color: #fffbf8;
+        border: solid 1px #004478;
+        font-size: 20px;
+        font-weight: bold;
+        color: #010a15;
+      }
+      #login_page_ssc #verify_code_ssc {
+        width: 100px;
+        height: 25px;
+        background-color: #fffbf8;
+        border: solid 1px #004478;
+        font-size: 20px;
+        font-weight: bold;
+        color: #010a15;
+        float: left;
+      }
+      #login_page_ssc .btn {
+        margin: 20px 0 0 279px;
+        background-position: 0px 0;
+      }
+      #login_page_ssc .btn_m {
+        margin: 20px 0 0 279px;
+        background-position: -90px 0;
+        cursor: pointer;
+      }
+      #login_page_ssc .btn,
+      #login_page_ssc .btn_m {
+        width: 90px;
+        height: 31px;
+        border: 0px solid #FF9224;
+        background-color: #FFFFFF;
+        background-image: url(/admin/static/img/login2/But.jpg);
+      }
+      #login_page_ssc .loginBg1 {
+        background: url(/admin/static/img/login2/login_1.jpg) no-repeat;
+      }
+      #login_page_ssc .loginBg2 {
+        background: url(/admin/static/img/login2/login_2.jpg) no-repeat;
+      }
+      #login_page_ssc .loginBg3 {
+        background: url(/admin/static/img/login2/login_3.jpg) no-repeat;
+      }
+    </style>
+    <script src="https://cdn.staticfile.org/jquery/3.7.1/jquery.min.js"></script>
+  </head>
+  <body id="container">
+    <div id="login_page_ssc">
+      <table width="100%" height="100%" border="0" cellpadding="0" cellspacing="0">
+        <tbody>
+          <tr>
+            <td>
+              <table id="login_table_ssc" width="568" border="0" align="center" cellpadding="0" cellspacing="0">
+                <tbody>
+                  <tr>
+                    <td height="121" class="loginBg1">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td height="102" class="loginBg2">
+                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                          <tr>
+                            <td width="278"></td>
+                            <td width="290" valign="top">
+                              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tbody>
+                                  <tr>
+                                    <td id="html_username_ssc" height="34" valign="top">
+                                      <input type="text" value="" id="username_ssc" tabindex="1" />
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td id="html_password_ssc" height="34" valign="top">
+                                      <input type="password" value="" tabindex="2" id="password_ssc" />
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td height="29" valign="top">
+                                      <input
+                                        type="text"
+                                        value=""
+                                        id="verify_code_ssc"
+                                        tabindex="3"
+                                        maxlength="4"
+                                        onkeydown="handleKeyDown(event)"
+                                        onfocus="doRefreshImg()"
+                                      />
+                                      <span style="float: left; margin-left: 5px">
+                                        <img
+                                          id="imgVerifyCode_ssc"
+                                          width="100"
+                                          height="29"
+                                          border="0"
+                                          title="获取验证码"
+                                          align="absmiddle"
+                                          style="display: none;"
+                                          onclick="changeVerifyCodeImage()"
+                                          onerror="refreshVerifyCodeImg(1)"
+                                          onload="refreshVerifyCodeImg(0)"
+                                        >
+                                      </span>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td height="145" valign="top" class="loginBg3">
+                      <input
+                        type="button"
+                        value=""
+                        class="btn"
+                        tabindex="4"
+                        onmouseout="this.className='btn'"
+                        onmouseover="this.className='btn_m'"
+                        onclick="doLogin()"
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <script>
+      let loading = false // 加载中
+      let needRefreshImg = 1 // 刷新图片标记
+      // 需要刷新图片
+      function refreshVerifyCodeImg(val) {
+        needRefreshImg = +val || 0
+      }
+      // 刷新图片
+      function doRefreshImg() {
+        if (needRefreshImg) {
+          changeVerifyCodeImage()
+        }
+      }
+      // 换一张验证码
+      function changeVerifyCodeImage() {
+        let t = new Date().valueOf() + ''
+        let newSrc = '/api/cms/user/verify_code?t=' + t
+        $('#imgVerifyCode_ssc').css('display', 'inline-block')
+        $('#imgVerifyCode_ssc').attr('src', newSrc)
+        $('#verify_code_ssc').val('')
+      }
+      // 处理键盘事件
+      function handleKeyDown(e) {
+        if (e.keyCode == 13) {
+          doLogin()
+        }
+      }
+      // 用户登陆
+      function doLogin() {
+        if (loading) {
+          return
+        }
+        // 获取数据
+        let username = ''
+        let password = ''
+        let verify_code = ''
+        username = $('#username_ssc').val()
+        password = $('#password_ssc').val()
+        verify_code = $('#verify_code_ssc').val()
+        let _username = username.trim()
+        // 判断数据
+        if (!_username) {
+          alert('請輸入用戶名')
+          return
+        }
+        if (!password) {
+          alert('請輸入密碼')
+          return
+        }
+        if (!verify_code) {
+          alert('請輸入驗證碼')
+          return
+        }
+        // 请求参数
+        let params = {
+          username: _username,
+          password: password,
+          verify_code: verify_code
+        }
+        // 发起请求
+        try {
+          loading = true
+          $.ajax({
+            type: 'POST',
+            url: '/api/cms/user/login',
+            data: params,
+            dataType: 'json',
+            success: function(res) {
+              if (res && res.message === 'ok') {
+                loading = false
+                parent.window.localStorage.setItem('cms_login_res', JSON.stringify(res))
+                parent.window.location.href = '/admin/_index.html'
+              } else {
+                loading = false
+                changeVerifyCodeImage()
+                alert('登陸失敗！')
+              }
+            },
+            error: function(err) {
+              loading = false
+              changeVerifyCodeImage()
+              if (err && err.responseJSON && err.responseJSON.message) {
+                alert(err.responseJSON.message)
+              } else {
+                alert('登陸失敗！！')
+              }
+            }
+          })
+        } catch (e) {
+          loading = false
+          changeVerifyCodeImage()
+          alert('登陸失敗！！！')
+        }
+      }
+      // 判断是否手机设备
+      function isMobile() {
+        let isMobile = window.navigator.userAgent.match(/Mobile/) && window.navigator.userAgent.match(/Mobile/)[0] === 'Mobile'
+        let isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
+        return isMobile || isSafari
+      }
+      // 重置视图大小
+      function resetViewSize() {
+        let w = document.documentElement.clientWidth || document.body.clientWidth
+        let h = document.documentElement.clientHeight || document.body.clientHeight
+        if (+h > +w) { // 竖屏
+          $('#container').css('transform', 'scale(1.2)')
+          // 处理时时界面
+          $('#login_table_ssc').css('margin-top', '-30%')
+        } else { // 横屏
+          // 处理时时界面
+        }
+      }
+      // 判断苹果浏览器
+      function isSafari() {
+        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
+        return isSafari
+      }
+      // 页面加载完成
+      window.onload = function() {
+        // 判断是否手机设备
+        if (isMobile()) {
+          // resetViewSize()
+          $('.loginBg1').css('position', 'relative')
+          $('.loginBg1').css('top', '1px')
+          $('.loginBg3').css('position', 'relative')
+          $('.loginBg3').css('top', '-1.5px')
+        }
+        // 苹果浏览器
+        if (isSafari()) {
+          $('#username_ssc').css('height', '18px')
+          $('#password_ssc').css('height', '18px')
+          $('#verify_code_ssc').css('height', '18px')
+        }
+      }
+    </script>
+  </body>
+</html>
